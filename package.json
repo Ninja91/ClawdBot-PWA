@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "dev": "bunx --bun vite",
+    "build": "bunx --bun vite build",
+    "build:types": "tsc -b",
+    "preview": "bunx --bun vite preview"
   },
   "dependencies": {
     "@kobalte/core": "^0.13.11",
@@ -31,6 +32,7 @@
     "@types/node": "^24.10.1",
     "@types/prismjs": "^1.26.5",
     "autoprefixer": "^10.4.24",
+    "lightningcss": "^1.31.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.3",

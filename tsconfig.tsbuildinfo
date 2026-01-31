@@ -1,1 +1,1 @@
-{"root":["./vite.config.ts","./src/app.tsx","./src/index.tsx","./src/components/ui/avatar.tsx","./src/components/ui/button.tsx","./src/components/ui/skeleton.tsx","./src/lib/api.ts","./src/lib/utils.ts"],"errors":true,"version":"5.9.3"}
+{"root":["./vite.config.ts","./src/app.tsx","./src/index.tsx","./src/components/ui/avatar.tsx","./src/components/ui/button.tsx","./src/components/ui/chart.tsx","./src/components/ui/markdown.tsx","./src/components/ui/skeleton.tsx","./src/lib/api.ts","./src/lib/utils.ts"],"errors":true,"version":"5.9.3"}

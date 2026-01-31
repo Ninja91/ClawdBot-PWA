@@ -12,11 +12,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'icons/*.svg'],
       manifest: {
-        name: 'Jenny',
+        name: 'Jenny AI',
         short_name: 'Jenny',
-        description: 'Your AI companion',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        description: 'Advanced AI Companion',
+        theme_color: '#09090b',
+        background_color: '#09090b',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
@@ -35,6 +35,19 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+            },
+          },
+        ],
       },
     }),
   ],
@@ -42,6 +55,9 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, './src'),
     },
+  },
+  css: {
+    transformer: 'lightningcss',
   },
   server: {
     port: 3000,
@@ -56,5 +72,15 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+    cssMinify: 'lightningcss',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'solid': ['solid-js', 'solid-js/web'],
+          'charts': ['chart.js'],
+          'markdown': ['marked', 'dompurify', 'prismjs'],
+        },
+      },
+    },
   },
 });

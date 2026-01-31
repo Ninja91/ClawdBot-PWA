@@ -20,7 +20,8 @@ export interface ChatResponse {
 
 export async function sendMessage(
   messages: ChatMessage[],
-  onChunk?: (chunk: string) => void
+  onChunk?: (chunk: string) => void,
+  signal?: AbortSignal
 ): Promise<string> {
   const response = await fetch(`${GATEWAY_URL}/v1/chat/completions`, {
     method: 'POST',
@@ -34,6 +35,7 @@ export async function sendMessage(
       messages,
       stream: !!onChunk,
     }),
+    signal,
   });
 
   if (!response.ok) {

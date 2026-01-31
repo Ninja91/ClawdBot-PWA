@@ -14,12 +14,11 @@ interface MarkdownProps {
   content: string;
 }
 
-type ContentPart = 
-  | { type: 'markdown', content: string }
-  | { type: 'chart', data: any };
+type MarkdownPart = { type: 'markdown', content: string };
+type ChartPart = { type: 'chart', data: any };
+type ContentPart = MarkdownPart | ChartPart;
 
 export const Markdown = (props: MarkdownProps) => {
-  // Configure marked for GFM and tables
   marked.setOptions({
     breaks: true,
     gfm: true
@@ -28,15 +27,12 @@ export const Markdown = (props: MarkdownProps) => {
   const parts = createMemo(() => {
     const content = props.content;
     const result: ContentPart[] = [];
-    
-    // Regex to find ```json:chart ... ``` blocks
     const chartRegex = /```json:chart\n([\s\S]*?)\n```/g;
     
     let lastIndex = 0;
     let match;
 
     while ((match = chartRegex.exec(content)) !== null) {
-      // Add markdown before the chart
       if (match.index > lastIndex) {
         result.push({ 
           type: 'markdown', 
@@ -44,22 +40,18 @@ export const Markdown = (props: MarkdownProps) => {
         });
       }
 
-      // Try to parse chart data
       try {
         const chartData = JSON.parse(match[1]);
         result.push({ type: 'chart', data: chartData });
       } catch (e) {
-        // If parsing fails, treat it as markdown (it will show as a code block)
         result.push({ 
           type: 'markdown', 
           content: match[0] 
         });
       }
-
       lastIndex = chartRegex.lastIndex;
     }
 
-    // Add remaining markdown
     if (lastIndex < content.length) {
       result.push({ 
         type: 'markdown', 
@@ -67,16 +59,13 @@ export const Markdown = (props: MarkdownProps) => {
       });
     }
 
-    return result.length > 0 ? result : [{ type: 'markdown', content: content }];
+    return result.length > 0 ? result : [{ type: 'markdown', content: content } as MarkdownPart];
   });
 
   const renderMarkdown = (text: string) => {
     const rawHtml = marked.parse(text) as string;
     const sanitizedHtml = DOMPurify.sanitize(rawHtml);
-    
-    // Trigger Prism highlight after DOM update
     setTimeout(() => Prism.highlightAll(), 50);
-    
     return sanitizedHtml;
   };
 
@@ -84,16 +73,19 @@ export const Markdown = (props: MarkdownProps) => {
     <div class="flex flex-col gap-2 w-full max-w-none overflow-hidden">
       <For each={parts()}>
         {(part) => (
-          <Show when={part.type === 'markdown'} fallback={
+          <Show 
+            when={part.type === 'chart'} 
+            fallback={
+              <div 
+                class="markdown-body w-full overflow-hidden"
+                innerHTML={renderMarkdown((part as MarkdownPart).content)} 
+              />
+            }
+          >
             <ChatChart 
-              type={part.data.type || 'bar'} 
-              data={part.data.data} 
-              options={part.data.options} 
-            />
-          }>
-            <div 
-              class="markdown-body w-full overflow-hidden"
-              innerHTML={renderMarkdown((part as any).content)} 
+              type={(part as ChartPart).data.type || 'bar'} 
+              data={(part as ChartPart).data.data} 
+              options={(part as ChartPart).data.options} 
             />
           </Show>
         )}
